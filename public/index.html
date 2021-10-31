@@ -17,8 +17,8 @@
               </div>  
             </div>
         </div>
-        <input type="text" id="username" placeholder="Nombre de Usuario">
-        <input type="text" id="message" placeholder="Mensaje">
+        <input type="text" id="username" placeholder="Nombre de Usuario" required>
+        <input type="number" id="message" placeholder="Mensaje" onkeypress="return valideKey(event);" maxlength="4" required>
         <button type="button" id="send">Envíar</button>
     </div>
     
