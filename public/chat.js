@@ -28,7 +28,7 @@ btn.addEventListener('click', function() {
     <strong>${username.value}(Mensaje descifrado)</strong>: ${message.value}
   </p>`;
   //comienza el cifrado
-  var tamprimo = new int; //2, 3, 4 etc
+  var tamprimo = 3; //2, 3, 4 etc
    var p = new BigInt;
    var q = new BigInt;
    var n = new BigInt;
@@ -36,10 +36,57 @@ btn.addEventListener('click', function() {
    var e = new BigInt;
    var d = new BigInt;
 
+  p = new BigInt(tamprimo, 10, new Random());
+  
+  do q = new BigInt(tamprimo, 10, new Random());
+   while(q.compareTo(p)==0); 
+
+   //return p, q;
+
+   n = p.multiply(q);
+
+   console.log(p);
+   console.log(q);
+   console.log(n);
+  
+   //(p-1)
+   fi = p.subtract(BigInt.valueOf(1));
+   
+   fi = fi.multiply(q.subtract(BigInt.valueOf(1)));
+
+   do e = new BigInt(2*tamprimo, new Random());
+   while((e.compareTo(fi) != -1) || (e.gcd(fi).compareTo(BigInteger.valueOf(1)) != 0));
+
+   
+   d = e.modInverse(fi);
+        
+  var i = new int;
+  var temp = new byte(1);
+  var digitos = mensaje.getBytes();
+  
+  var bigdigitos = new BigInt(digitos.length);
+  
+  for(i = 0; i < bigdigitos.length; i++){
+      temp(0) = digitos(i);
+      bigdigitos(i) = new BigInt(temp);
+  }
+  
+  var cifrado = new BigInt(bigdigitos.length);
+  
+  for(i = 0; i < bigdigitos.length; i++){
+      //formula
+      // c = M ^ e mod n
+      cifrado(i) = bigdigitos(i).modPow(e, n);
+  }
+
+  console.log(cifrado);
+
 
   socket.emit('chat:message', {
-    message: message.value,
-    username: username.value
+    message: cifrado.value,
+    username: username.value,
+    d: d.value, 
+    n: n.value
   });
   
 });
@@ -52,7 +99,9 @@ socket.on('chat:message', function(data) {
   actions.innerHTML = '';
   output.innerHTML += `<p>
     <strong>${data.username}(Mensaje cifrado)</strong>: ${data.message}
-  </p>`
+  </p>
+  <p><strong>${data.d}</strong></p>
+  <p><strong>${data.n}</strong></p>`
 });
 
 socket.on('chat:typing', function(data) {
@@ -60,11 +109,13 @@ socket.on('chat:typing', function(data) {
 });
 
 function generarPrimos(){
-    
+  var tamprimo = 3; //2, 3, 4 etc
   p = new BigInt(tamprimo, 10, new Random());
   
   do q = new BigInt(tamprimo, 10, new Random());
    while(q.compareTo(p)==0); 
+
+   return p, q;
 
 }
 
@@ -99,6 +150,27 @@ function generarClaves(){
 }
 
 function cifrar(mensaje){
+
+  var tamprimo = 3; //2, 3, 4 etc
+  p = new BigInt(tamprimo, 10, new Random());
+  
+  do q = new BigInt(tamprimo, 10, new Random());
+   while(q.compareTo(p)==0); 
+
+   //return p, q;
+
+   n = p.multiply(q);
+  
+   //(p-1)
+   fi = p.subtract(BigInt.valueOf(1));
+   
+   fi = fi.multiply(q.subtract(BigInt.valueOf(1)));
+
+   do e = new BigInt(2*tamprimo, new Random());
+   while((e.compareTo(fi) != -1) || (e.gcd(fi).compareTo(BigInteger.valueOf(1)) != 0));
+
+   
+   d = e.modInverse(fi);
         
   var i = new int;
   var temp = new byte[1];
@@ -119,7 +191,7 @@ function cifrar(mensaje){
       cifrado[i] = bigdigitos[i].modPow(e, n);
   }
   
-  return cifrado;
+  return cifrado, d , n;
 }
 
 //desciframos con clave privada
